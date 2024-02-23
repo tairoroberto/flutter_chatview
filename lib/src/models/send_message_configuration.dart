@@ -142,6 +142,9 @@ class TextFieldConfiguration {
   /// Used to give text input type of text field.
   final TextInputType? textInputType;
 
+  /// Used to give text input action of text field.
+  final TextInputAction? textInputAction;
+
   /// Used to give list of input formatters for text field.
   final List<TextInputFormatter>? inputFormatters;
 
@@ -150,6 +153,8 @@ class TextFieldConfiguration {
 
   /// Callback when a user starts/stops typing a message by [TypeWriterStatus]
   final void Function(TypeWriterStatus status)? onMessageTyping;
+
+  final ValueChanged<String>? onSubmitMessage;
 
   /// After typing stopped, the threshold time after which the composing
   /// status to be changed to [TypeWriterStatus.composed].
@@ -167,7 +172,9 @@ class TextFieldConfiguration {
     this.margin,
     this.minLines,
     this.textInputType,
+    this.textInputAction,
     this.onMessageTyping,
+    this.onSubmitMessage,
     this.compositionThresholdTime = const Duration(seconds: 1),
     this.inputFormatters,
     this.textCapitalization,
