@@ -3,7 +3,7 @@ class FeatureActiveConfig {
     this.enableSwipeToReply = true,
     this.enableReactionPopup = true,
     this.enableTextField = true,
-    this.enableSwipeToSeeTime = true,
+    this.enableSwipeToSeeTime = false,
     this.enableCurrentUserProfileAvatar = false,
     this.enableOtherUserProfileAvatar = true,
     this.enableReplySnackBar = true,

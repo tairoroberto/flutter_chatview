@@ -42,6 +42,7 @@ class ChatUITextField extends StatefulWidget {
     required this.onPressed,
     required this.onRecordingComplete,
     required this.onImageSelected,
+    this.onClosePressed,
   }) : super(key: key);
 
   /// Provides configuration of default text field in chat.
@@ -55,6 +56,9 @@ class ChatUITextField extends StatefulWidget {
 
   /// Provides callback when user tap on text field.
   final VoidCallBack onPressed;
+
+  /// Provides callback when user tap on close button.
+  final VoidCallBack? onClosePressed;
 
   /// Provides callback once voice is recorded.
   final Function(String?) onRecordingComplete;
@@ -150,58 +154,78 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                         waveColor: voiceRecordingConfig?.waveStyle?.waveColor ?? Colors.black,
                       ),
                 )
-              else
-                Expanded(
-                  child: TextField(
-                    focusNode: widget.focusNode,
-                    controller: widget.textEditingController,
-                    style: textFieldConfig?.textStyle ?? const TextStyle(color: Colors.white),
-                    maxLines: textFieldConfig?.maxLines ?? 5,
-                    minLines: textFieldConfig?.minLines ?? 1,
-                    keyboardType: textFieldConfig?.textInputType,
-                    textInputAction: textFieldConfig?.textInputAction,
-                    inputFormatters: textFieldConfig?.inputFormatters,
-                    onChanged: _onChanged,
-                    onSubmitted: (text) {
-                      if (text.isNotEmpty) {
-                        _onChanged(text);
-                        widget.onPressed();
-                      }
-                      textFieldConfig?.onSubmitMessage?.call(text);
-                    },
-                    textCapitalization: textFieldConfig?.textCapitalization ?? TextCapitalization.sentences,
-                    decoration: InputDecoration(
-                      hintText: textFieldConfig?.hintText ?? PackageStrings.message,
-                      fillColor: sendMessageConfig?.textFieldBackgroundColor ?? Colors.white,
-                      filled: true,
-                      hintStyle: textFieldConfig?.hintStyle ??
-                          TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade600,
-                            letterSpacing: 0.25,
-                          ),
-                      contentPadding: textFieldConfig?.contentPadding ?? const EdgeInsets.symmetric(horizontal: 6),
-                      border: _outLineBorder,
-                      focusedBorder: _outLineBorder,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.transparent),
-                        borderRadius: textFieldConfig?.borderRadius ?? BorderRadius.circular(textFieldBorderRadius),
-                      ),
+              else if (sendMessageConfig?.showCloseButtonIcon ?? false)
+                GestureDetector(
+                  onTap: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    widget.onClosePressed?.call();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: sendMessageConfig?.closeButtonIcon ??
+                        Icon(
+                          Icons.close,
+                          color: imagePickerIconsConfig?.cameraIconColor,
+                        ),
+                  ),
+                ),
+              Expanded(
+                child: TextField(
+                  focusNode: widget.focusNode,
+                  controller: widget.textEditingController,
+                  style: textFieldConfig?.textStyle ?? const TextStyle(color: Colors.white),
+                  maxLines: textFieldConfig?.maxLines ?? 5,
+                  minLines: textFieldConfig?.minLines ?? 1,
+                  keyboardType: textFieldConfig?.textInputType,
+                  textInputAction: textFieldConfig?.textInputAction,
+                  inputFormatters: textFieldConfig?.inputFormatters,
+                  onChanged: _onChanged,
+                  onSubmitted: (text) {
+                    if (text.isNotEmpty) {
+                      _onChanged(text);
+                      widget.onPressed();
+                    }
+                    textFieldConfig?.onSubmitMessage?.call(text);
+                  },
+                  textCapitalization: textFieldConfig?.textCapitalization ?? TextCapitalization.sentences,
+                  decoration: InputDecoration(
+                    hintText: textFieldConfig?.hintText ?? PackageStrings.message,
+                    fillColor: sendMessageConfig?.textFieldBackgroundColor ?? Colors.white,
+                    filled: true,
+                    hintStyle: textFieldConfig?.hintStyle ??
+                        TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey.shade600,
+                          letterSpacing: 0.25,
+                        ),
+                    contentPadding: textFieldConfig?.contentPadding ?? const EdgeInsets.symmetric(horizontal: 6),
+                    border: _outLineBorder,
+                    focusedBorder: _outLineBorder,
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.transparent),
+                      borderRadius: textFieldConfig?.borderRadius ?? BorderRadius.circular(textFieldBorderRadius),
                     ),
                   ),
                 ),
+              ),
               ValueListenableBuilder<String>(
                 valueListenable: _inputText,
                 builder: (_, inputTextValue, child) {
                   if (inputTextValue.isNotEmpty) {
-                    return IconButton(
-                      color: sendMessageConfig?.defaultSendButtonColor ?? Colors.green,
-                      onPressed: () {
+                    return GestureDetector(
+                      onTap: () {
                         widget.onPressed();
                         _inputText.value = '';
                       },
-                      icon: sendMessageConfig?.sendButtonIcon ?? const Icon(Icons.send),
+                      child: sendMessageConfig?.sendButtonIcon ??
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(
+                              Icons.send,
+                              color: sendMessageConfig?.defaultSendButtonColor ?? Colors.green,
+                            ),
+                          ),
                     );
                   } else {
                     return Row(

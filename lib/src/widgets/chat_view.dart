@@ -25,6 +25,7 @@ import 'package:chatview/src/widgets/chat_view_inherited_widget.dart';
 import 'package:chatview/src/widgets/chatview_state_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart';
+
 import '../values/custom_time_messages.dart';
 import 'send_message_widget.dart';
 
@@ -34,6 +35,7 @@ class ChatView extends StatefulWidget {
     required this.chatController,
     required this.currentUser,
     this.onSendTap,
+    this.onCloseButtonTap,
     this.profileCircleConfig,
     this.chatBubbleConfig,
     this.repliedMessageConfig,
@@ -54,10 +56,8 @@ class ChatView extends StatefulWidget {
     required this.chatViewState,
     ChatViewStateConfiguration? chatViewStateConfig,
     this.featureActiveConfig = const FeatureActiveConfig(),
-  })  : chatBackgroundConfig =
-            chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
-        chatViewStateConfig =
-            chatViewStateConfig ?? const ChatViewStateConfiguration(),
+  })  : chatBackgroundConfig = chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
+        chatViewStateConfig = chatViewStateConfig ?? const ChatViewStateConfiguration(),
         super(key: key);
 
   /// Provides configuration related to user profile circle avatar.
@@ -102,6 +102,9 @@ class ChatView extends StatefulWidget {
   /// message, reply message and message type.
   final StringMessageCallBack? onSendTap;
 
+  /// Provides call back when user tap on close button in text field. It returns
+  final VoidCallBack? onCloseButtonTap;
+
   /// Provides builder which helps you to make custom text field and functionality.
   final ReplyMessageWithReturnWidget? sendMessageBuilder;
 
@@ -141,23 +144,19 @@ class ChatView extends StatefulWidget {
   State<ChatView> createState() => _ChatViewState();
 }
 
-class _ChatViewState extends State<ChatView>
-    with SingleTickerProviderStateMixin {
+class _ChatViewState extends State<ChatView> with SingleTickerProviderStateMixin {
   final GlobalKey<SendMessageWidgetState> _sendMessageKey = GlobalKey();
-  ValueNotifier<ReplyMessage> replyMessage =
-      ValueNotifier(const ReplyMessage());
+  ValueNotifier<ReplyMessage> replyMessage = ValueNotifier(const ReplyMessage());
 
   ChatController get chatController => widget.chatController;
 
   // bool get showTypingIndicator => widget.showTypingIndicator;
 
-  ChatBackgroundConfiguration get chatBackgroundConfig =>
-      widget.chatBackgroundConfig;
+  ChatBackgroundConfiguration get chatBackgroundConfig => widget.chatBackgroundConfig;
 
   ChatViewState get chatViewState => widget.chatViewState;
 
-  ChatViewStateConfiguration? get chatViewStateConfig =>
-      widget.chatViewStateConfig;
+  ChatViewStateConfiguration? get chatViewStateConfig => widget.chatViewStateConfig;
 
   FeatureActiveConfig get featureActiveConfig => widget.featureActiveConfig;
 
@@ -174,9 +173,7 @@ class _ChatViewState extends State<ChatView>
     // Scroll to last message on in hasMessages state.
     // TODO: Remove this in new versions.
     // ignore: deprecated_member_use_from_same_package
-    if (widget.showTypingIndicator ||
-        widget.chatController.showTypingIndicator &&
-            chatViewState.hasMessages) {
+    if (widget.showTypingIndicator || widget.chatController.showTypingIndicator && chatViewState.hasMessages) {
       chatController.scrollToLastMessage();
     }
     return ChatViewInheritedWidget(
@@ -184,8 +181,7 @@ class _ChatViewState extends State<ChatView>
       featureActiveConfig: featureActiveConfig,
       currentUser: widget.currentUser,
       child: Container(
-        height:
-            chatBackgroundConfig.height ?? MediaQuery.of(context).size.height,
+        height: chatBackgroundConfig.height ?? MediaQuery.of(context).size.height,
         width: chatBackgroundConfig.width ?? MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           color: chatBackgroundConfig.backgroundColor ?? Colors.white,
@@ -206,21 +202,18 @@ class _ChatViewState extends State<ChatView>
                 children: [
                   if (chatViewState.isLoading)
                     ChatViewStateWidget(
-                      chatViewStateWidgetConfig:
-                          chatViewStateConfig?.loadingWidgetConfig,
+                      chatViewStateWidgetConfig: chatViewStateConfig?.loadingWidgetConfig,
                       chatViewState: chatViewState,
                     )
                   else if (chatViewState.noMessages)
                     ChatViewStateWidget(
-                      chatViewStateWidgetConfig:
-                          chatViewStateConfig?.noMessageWidgetConfig,
+                      chatViewStateWidgetConfig: chatViewStateConfig?.noMessageWidgetConfig,
                       chatViewState: chatViewState,
                       onReloadButtonTap: chatViewStateConfig?.onReloadButtonTap,
                     )
                   else if (chatViewState.isError)
                     ChatViewStateWidget(
-                      chatViewStateWidgetConfig:
-                          chatViewStateConfig?.errorWidgetConfig,
+                      chatViewStateWidgetConfig: chatViewStateConfig?.errorWidgetConfig,
                       chatViewState: chatViewState,
                       onReloadButtonTap: chatViewStateConfig?.onReloadButtonTap,
                     )
@@ -247,9 +240,7 @@ class _ChatViewState extends State<ChatView>
                           repliedMessageConfig: widget.repliedMessageConfig,
                           swipeToReplyConfig: widget.swipeToReplyConfig,
                           onChatListTap: widget.onChatListTap,
-                          assignReplyMessage: (message) => _sendMessageKey
-                              .currentState
-                              ?.assignReplyMessage(message),
+                          assignReplyMessage: (message) => _sendMessageKey.currentState?.assignReplyMessage(message),
                         );
                       },
                     ),
@@ -261,9 +252,9 @@ class _ChatViewState extends State<ChatView>
                       sendMessageConfig: widget.sendMessageConfig,
                       backgroundColor: chatBackgroundConfig.backgroundColor,
                       onSendTap: _onSendTap,
+                      onCloseButtonTap: widget.onCloseButtonTap,
                       onReplyCallback: (reply) => replyMessage.value = reply,
-                      onReplyCloseCallback: () =>
-                          replyMessage.value = const ReplyMessage(),
+                      onReplyCloseCallback: () => replyMessage.value = const ReplyMessage(),
                     ),
                 ],
               ),

@@ -35,6 +35,12 @@ class SendMessageConfiguration {
   /// Provides ability to give custom send button.
   final Widget? sendButtonIcon;
 
+  /// Provides ability to give custom close button.
+  final bool? showCloseButtonIcon;
+
+  /// Provides ability to give custom send button.
+  final Widget? closeButtonIcon;
+
   /// Used to give reply dialog color.
   final Color? replyDialogColor;
 
@@ -78,6 +84,8 @@ class SendMessageConfiguration {
     this.imagePickerConfiguration,
     this.defaultSendButtonColor,
     this.sendButtonIcon,
+    this.showCloseButtonIcon,
+    this.closeButtonIcon,
     this.replyDialogColor,
     this.replyTitleColor,
     this.replyMessageColor,
